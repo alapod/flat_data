@@ -1,8 +1,11 @@
 ﻿using System;
 using AngleSharp.Html.Parser;
 
-await BiruzaParser.BiruzaParser.ReadWithAngleSharpAsync("sold");
-
+//await BiruzaParser.BiruzaParser.ReadWithAngleSharpAsync("sold");
+//await BiruzaParser.BiruzaParser.ReadWithAngleSharpAsync("booked");
+//await BiruzaParser.BiruzaParser.ReadWithAngleSharpAsync("onsale");
+string[] links = new string[] {"biruza_sold.txt", "biruza_booked.txt","biruza_onsale.txt"};
+BiruzaParser.BiruzaParser.CreateFinal(links);
 namespace BiruzaParser 
 {
 
@@ -28,7 +31,7 @@ namespace BiruzaParser
                 filename = "biruza_booked.txt";
             } else {
                 link = onSaleFlatsLink;
-                filename = "biruza_onsale";
+                filename = "biruza_onsale.txt";
             }
             var htmlSourceCode = await SendRequestWithHttpClientAsync(link);
             var parser = new HtmlParser();
@@ -41,10 +44,25 @@ namespace BiruzaParser
 
         static async Task WriteData(String data, string filename) {
             data = String.Concat(data.Where(c => !Char.IsWhiteSpace(c)));
-            using StreamWriter file = new("Biruza.txt", append: true);
+            using StreamWriter file = new(filename, append: true);
             await file.WriteLineAsync(data);
-    }
+        }
 
+        public static void CreateFinal(string[] links){
+            foreach (string link in links) {
+                string[] lines = System.IO.File.ReadAllLines(link);
+
+                for (int i=0; i<lines.Length; i+=11) {
+                    string[] output = {lines[i+5], lines[i+8], "FLOOR", lines[i+1], lines[i], lines[i+2], "PP", lines[i+3], DateTime.Today.ToString()};
+                    Console.WriteLine(String.Join('|', output));
+                }
+            }
+        }
     }
 }
+//flat_id|flat_num|building|floor|area|rooms|price|sprice|status|date
+//413484|284|Блок 2|5|45.70|1|6023260|131800.00|В продаже|2020-11-15
+
+
+   
 
